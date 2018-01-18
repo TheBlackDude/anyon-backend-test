@@ -4,6 +4,7 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose')
+const passport = require('passport')
 
 const index = require('./server/routes/index');
 const users = require('./server/routes/users');
@@ -17,7 +18,11 @@ mongoose.connection.on('error', function() {
   console.error('Database connection error. Make sure your database is running')
 })
 
+// Initialize express
 const app = express();
+
+// Passport configuration
+require('./server/config/passport')(passport)
 
 // view engine setup
 app.set('views', path.join(__dirname, 'server/views'));
