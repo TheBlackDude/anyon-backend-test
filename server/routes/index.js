@@ -39,6 +39,66 @@ router.get('/:user_id', function(req, res, next) {
   })
 })
 
+// calculate the distance
+const earth = (function() {
+  const earthRadius = 6371 // km, miles is 3959
+
+  const getDistanceFromRads = function (rads) {
+    return parseFloat(rads * earthRadius)
+  }
+
+  const getRadsFromDistance = function (distance) {
+    return parseFloat(distance / earthRadius)
+  }
+
+  return {
+    getDistanceFromRads: getDistanceFromRads,
+    getRadsFromDistance: getRadsFromDistance
+  }
+})()
+
+// Generate messages
+const buildMessageList = function(req, res, results, stats) {
+  const messages = []
+  results.forEach(function(doc) {
+    messages.push({
+      distance: earth.getDistanceFromRads(doc.dis),
+      name: doc.obj.name
+    })
+  })
+}
+
+// GET list of messages by distance
+router.get('/messages/distance', function(req, res) {
+  const lng = parseFloat(req.body.lng)
+  const lat = parseFloat(req.body.lat)
+  const maxDistance = parseFloat(req.query.maxDistance)
+  const point {
+    type: "Point",
+    coordinates: [lng, lat]
+  }
+  const geoOptions = {
+    spherical: true,
+    maxDistance: earth.getRadsFromDistance(maxDistance),
+    num: 10
+  }
+  if ((!lng && lng !== 0) || (!lat && lat !== 0) !maxDistance) {
+    console.log('locationsListByDistance missing params')
+    return
+  }
+  Message.geoNear(point, geoOptions, function(err, results, stats) {
+    console.log('Geo results', results)
+    console.log('Geo stats', stats)
+    if (err) {
+      console.log('GeoNear error: ', err)
+      res.send(err)
+    } else {
+      const messages = buildMessageList(req, res, results, stats)
+      res.json(messages)
+    }
+  })
+})
+
 // GET all messages
 router.get('/messages', function(req, res) {
   Message.find(function(err, messages) {
@@ -66,6 +126,7 @@ router.post('/message', function(req, res) {
 
   // get the message (coming from the request)
   message.name = req.body.name
+  message.coords = [parseFloat(req.body.lng), parseFloat(req.body.lat)]
 
   // save the message
   message.save(function(err) {
@@ -85,6 +146,7 @@ router.put('/:message_id', function(req, res) {
     }
     // update the message
     message.name = req.body.name
+    message.coords = [parseFloat(req.body.lng), parseFloat(req.body.lat)]
 
     message.save(function(err) {
       if (err) {
