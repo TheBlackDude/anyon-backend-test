@@ -3,18 +3,29 @@ const path = require('path');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose')
 
-const index = require('./routes/index');
-const users = require('./routes/users');
+const index = require('./server/routes/index');
+const users = require('./server/routes/users');
+
+// Database configuration
+const config = require('./server/config/config')
+// connect to the database
+mongoose.connect(config.url)
+// Check if the database is running
+mongoose.connection.on('error', function() {
+  console.error('Database connection error. Make sure your database is running')
+})
 
 const app = express();
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'server/views'));
 app.set('view engine', 'jade');
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+/*
+ * Middlewares Setup
+ */
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
