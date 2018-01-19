@@ -5,6 +5,9 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose')
 const passport = require('passport')
+/* Modules for session storage */
+const session = require('express-session')
+const MongoStore = require('connect-mongo')(session)
 
 const index = require('./server/routes/index');
 
@@ -32,9 +35,26 @@ app.set('view engine', 'jade');
  */
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+/* required for passport */
+app.use(session({
+  secret: 'secretTextHere',
+  saveUninitialized: true,
+  resave: true,
+  // Store session in mongoDB using express-session + connect-mongo
+  store: new MongoStore({
+    url: config.url,
+    collection: 'sessions'
+  })
+})
+
+// Init passport authentication
+app.use(passport.initialize())
+// Persist login sessions
+app.use(passport.session())
 
 app.use('/api', index);
 
