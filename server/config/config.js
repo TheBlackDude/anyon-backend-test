@@ -1,8 +1,9 @@
 /* Database URL */
+const keys = require('./keys')
+
 module.exports = {
   /*
-   * don't put your credentials here on a production app
-   * i just put it here for testing
+   * don't put your credentials here 
    */
-  'url': 'mongodb://anyon:12345@ds261527.mlab.com:61527/anyon'
+  'url': keys.mlab
 }
