@@ -73,7 +73,7 @@ router.get('/messages/distance', function(req, res) {
   const lng = parseFloat(req.body.lng)
   const lat = parseFloat(req.body.lat)
   const maxDistance = parseFloat(req.query.maxDistance)
-  const point {
+  const point = {
     type: "Point",
     coordinates: [lng, lat]
   }
@@ -82,7 +82,7 @@ router.get('/messages/distance', function(req, res) {
     maxDistance: earth.getRadsFromDistance(maxDistance),
     num: 10
   }
-  if ((!lng && lng !== 0) || (!lat && lat !== 0) !maxDistance) {
+  if ((!lng && lng !== 0) || (!lat && lat !== 0) || !maxDistance) {
     console.log('locationsListByDistance missing params')
     return
   }

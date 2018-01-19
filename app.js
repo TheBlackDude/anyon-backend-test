@@ -7,7 +7,6 @@ const mongoose = require('mongoose')
 const passport = require('passport')
 
 const index = require('./server/routes/index');
-const users = require('./server/routes/users');
 
 // Database configuration
 const config = require('./server/config/config')
