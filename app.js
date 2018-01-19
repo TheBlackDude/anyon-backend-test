@@ -16,6 +16,9 @@ const config = require('./server/config/config')
 // connect to the database
 mongoose.connect(config.url)
 // Check if the database is running
+mongoose.connection.on('connected', function() {
+  console.log('Database connected')
+})
 mongoose.connection.on('error', function() {
   console.error('Database connection error. Make sure your database is running')
 })
@@ -49,7 +52,7 @@ app.use(session({
     url: config.url,
     collection: 'sessions'
   })
-})
+}))
 
 // Init passport authentication
 app.use(passport.initialize())
